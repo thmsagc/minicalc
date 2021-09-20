@@ -41,7 +41,7 @@ void ImprimeTipoToken(TipoToken tipo) {
 }
 
 int main() {
-    InicializaLexer("../test/literal.mc");
+    InicializaLexer("/programs/testing.mc");
 
     Token *t = ProximoToken();
     while (t->tipo != TOKEN_EOF) {
