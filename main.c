@@ -30,10 +30,10 @@ void ImprimeTipoToken(TipoToken tipo) {
             printf("TOKEN_FECHAPAR");
             break;
         case TOKEN_ABRECOL:
-            printf("TOKEN_ABREPAR");
+            printf("TOKEN_ABRECOL");
             break;
         case TOKEN_FECHACOL:
-            printf("TOKEN_FECHAPAR");
+            printf("TOKEN_FECHACOL");
             break;
         case TOKEN_SOMA:
             printf("TOKEN_SOMA");
