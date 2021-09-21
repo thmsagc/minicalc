@@ -7,6 +7,7 @@
 
 typedef enum tagTipoToken {
     TOKEN_INT,
+    TOKEN_FLOAT,
     TOKEN_PRINT,
     TOKEN_ERRO,
     TOKEN_SOMA,
@@ -22,7 +23,7 @@ typedef enum tagTipoToken {
 
 typedef struct tagToken {
     TipoToken tipo;
-    int       valor;
+    double       valor;
 } Token;
 
 

@@ -86,11 +86,22 @@ Token* ProximoToken() {
         long initPos = pos;
         // TODO: verificar se existe erro léxico no final do literal inteiro
         while (!eof() && isdigit(buffer->cont[pos]))
-            pos++;
-        char *texto = TextoToken(initPos, pos);
-        tok->tipo = TOKEN_INT;
-        tok->valor = atoi(texto);
-        free(texto);
+            pos++;    
+        if(buffer->cont[pos] == '.'){
+        	pos++;
+		    while (!eof() && isdigit(buffer->cont[pos]))
+		        pos++;
+		    char *texto = TextoToken(initPos, pos);
+		    tok->tipo = TOKEN_FLOAT;
+		    tok->valor = atof(texto);
+		    free(texto);
+        } else {
+		    char *texto = TextoToken(initPos, pos);
+		    tok->tipo = TOKEN_INT;
+		    tok->valor = atoi(texto);
+		    free(texto);       
+        }
+
     } else if (simbolo(buffer->cont[pos])) {
         switch (buffer->cont[pos]) {
             case '(':
@@ -122,6 +133,14 @@ Token* ProximoToken() {
         }
         tok->valor = 0;
         pos++;
+    } else if(buffer->cont[pos] == '#'){
+    	long initPos = pos;
+		while (!eof() && buffer->cont[pos] != '\n')
+			pos++;
+		char *texto = TextoToken(initPos, pos); 
+		printf("Comentário: %s\n", texto);
+		free(texto);
+		ProximoToken();
     } else {
         tok->tipo = TOKEN_ERRO;
         tok->valor = 0;
