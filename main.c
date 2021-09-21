@@ -55,6 +55,13 @@ void ImprimeTipoToken(TipoToken tipo) {
     }
 }
 
+void ImprimeValorToken(double valor){
+	if(valor == (int) (valor))
+		printf(" - Valor do token: %d\n", (int) (valor));
+	else
+		printf(" - Valor do token: %f\n", valor);
+}
+
 int main() {
     InicializaLexer("./programs/testing.mc");
 
@@ -62,7 +69,7 @@ int main() {
     while (t->tipo != TOKEN_EOF) {
         printf("Tipo do token: ");
         ImprimeTipoToken(t->tipo);
-        printf(" - Valor do token: %f\n", t->valor);
+        ImprimeValorToken(t->valor);
 
         t = ProximoToken();
     }
