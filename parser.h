@@ -10,13 +10,15 @@ typedef enum tagTipoOper {
     OPER_SUBT,
     OPER_MULT,
     OPER_DIV,
+    OPER_MOD,
+    OPER_POW,
     OPER_CONST
 } TipoOper;
 
 typedef struct tagExpressao {
     struct tagExpressao *op1;
     struct tagExpressao *op2;
-    int valor;
+    float valor;
     TipoOper oper;
 } Expressao;
 

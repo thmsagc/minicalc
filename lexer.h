@@ -14,6 +14,8 @@ typedef enum tagTipoToken {
     TOKEN_SUBT,
     TOKEN_MULT,
     TOKEN_DIV,
+    TOKEN_MOD,
+    TOKEN_POW,
     TOKEN_ABREPAR,
     TOKEN_FECHAPAR,
     TOKEN_ABRECOL,

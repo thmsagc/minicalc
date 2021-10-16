@@ -51,7 +51,7 @@ Expressao* AnaliseExpressao() {
     t = ProximoToken();
 
     // se proximo token for constante inteira, retorne expressao constante
-    if (t->tipo == TOKEN_INT) {
+    if (t->tipo == TOKEN_INT || t->tipo == TOKEN_FLOAT) {
         res->oper = OPER_CONST;
         res->valor = t->valor;
         res->op1 = NULL;
@@ -59,10 +59,10 @@ Expressao* AnaliseExpressao() {
         return res;
     }
 
-    if (t->tipo != TOKEN_ABREPAR) {
-        fprintf(stderr, "Erro sintatico: '(' esperado");
-        exit(2);
-    }
+    //if (t->tipo != TOKEN_ABREPAR && t->tipo != TOKEN_ABRECOL) {
+    //    fprintf(stderr, "Erro sintatico: '(' ou '[' esperado");
+    //    exit(2);
+    //}
 
     // primeiro operando
     res->op1 = AnaliseExpressao(); // Expressao*
@@ -70,7 +70,7 @@ Expressao* AnaliseExpressao() {
     // operador
     t = ProximoToken();
 
-    if (t->tipo != TOKEN_SOMA && t->tipo != TOKEN_SUBT && t->tipo != TOKEN_MULT && t->tipo != TOKEN_DIV) {
+    if (t->tipo != TOKEN_SOMA && t->tipo != TOKEN_SUBT && t->tipo != TOKEN_MULT && t->tipo != TOKEN_DIV && t->tipo != TOKEN_MOD && t->tipo != TOKEN_POW) {
         fprintf(stderr, "Erro sintatico: operador esperado");
         exit(2);
     }
@@ -88,6 +88,12 @@ Expressao* AnaliseExpressao() {
         case TOKEN_DIV:
             res->oper = OPER_DIV;
             break;
+        case TOKEN_MOD:
+            res->oper = OPER_MOD;
+            break;
+        case TOKEN_POW:
+            res->oper = OPER_POW;
+            break;
     }
 
     // segundo operando
@@ -96,16 +102,16 @@ Expressao* AnaliseExpressao() {
     // parentese fechando
     t = ProximoToken();
 
-    if (t->tipo != TOKEN_FECHAPAR) {
-        fprintf(stderr, "Erro sintatico: ')' esperado");
-        exit(2);
-    }
+    //if (t->tipo != TOKEN_FECHAPAR && t->tipo != TOKEN_FECHACOL) {
+    //    fprintf(stderr, "Erro sintatico: ')' ou ']' esperado");
+    //    exit(2);
+    //}
 
     return res;
 }
 
 void DestroiExpressao(Expressao *e) {
-    if (e->oper == OPER_SOMA || e->oper == OPER_SUBT || e->oper == OPER_MULT || e->oper == OPER_DIV) {
+    if (e->oper == OPER_SOMA || e->oper == OPER_SUBT || e->oper == OPER_MULT || e->oper == OPER_DIV || e->oper == OPER_MOD || e->oper == OPER_POW) {
         DestroiExpressao(e->op1);
         DestroiExpressao(e->op2);
         e->op1 = NULL;
