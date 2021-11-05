@@ -12,6 +12,47 @@
 
 Token *t;
 
+Declaracao* AnaliseDeclaracao() {
+    t = ProximoToken();
+
+    if (t->tipo != TOKEN_VAR)
+        return NULL;
+
+    Declaracao *res = (Declaracao*) malloc(sizeof(Declaracao));
+
+    t = ProximoToken();
+
+    if (t->tipo != TOKEN_IDENT) {
+        fprintf(stderr, "Erro de sintaxe: identificador esperado\n");
+        free(res);
+        exit(2);
+    }
+
+    strcpy(res->nomeIdentificador, t->nome);
+
+    t = ProximoToken();
+
+    if (t->tipo != TOKEN_ASSIGN) {
+        fprintf(stderr, "Erro de sintaxe: '=' esperado\n");
+        free(res);
+        exit(2);
+    }
+
+    res->e = AnaliseExpressao();
+
+    t = ProximoToken();
+
+    if (t->tipo != TOKEN_PTVIR) {
+        fprintf(stderr, "Erro de sintaxe: ';' esperado no final da declaracao\n");
+        free(res);
+        exit(2);
+    }
+
+    return res;
+}
+
+
+
 // Analisador sintático do programa
 // Assume que o analisador léxico foi inicializado com o código-fonte
 Programa* AnalisePrograma() {
@@ -21,9 +62,22 @@ Programa* AnalisePrograma() {
         fprintf(stderr, "Erro de alocacao de memoria.");
         exit(1);
     }
+    
+    Declaracao *origem = AnaliseDeclaracao();
+ 
+    res->declaracao = origem;
+    
+    if (res->declaracao != NULL) {
+        Declaracao *d2 = AnaliseDeclaracao();
+        while (d2 != NULL) {
+            res->declaracao->proxima = d2;
+            res->declaracao = d2;
+            d2 = AnaliseDeclaracao();
+        }
+        res->declaracao->proxima = NULL;
+    }
 
-    // verifica se o programa começa com palavra-chave 'print'
-    t = ProximoToken();
+    res->declaracao = origem;
 
     if (t->tipo != TOKEN_PRINT) {
         fprintf(stderr, "Erro sintatico: palavra-chave 'print' esperada no inicio do programa.");
@@ -33,15 +87,10 @@ Programa* AnalisePrograma() {
     // analisa a expressao seguinte
     res->e = AnaliseExpressao();
 
-//    t = ProximoToken();
-//
-//    if (t->tipo != TOKEN_EOF) {
-//        fprintf(stderr, "Erro sintatico: entrada adicional apos fim do programa.");
-//        exit(2);
-//    }
 
     return res;
 }
+
 
 Expressao* AnaliseExpressao() {
     // analisa a expressao
@@ -59,6 +108,18 @@ Expressao* AnaliseExpressao() {
         return res;
     }
 
+
+	//se o próximo token for um identificador, retorne uma expressão composta por uma variável
+	if(t->tipo == TOKEN_IDENT){
+		res->oper = OPER_VAR;
+		res->valor = 0;
+		strcpy(res->nomeIdentificador, t->nome);
+        res->op1 = NULL;
+        res->op2 = NULL;
+        return res;	
+	}
+
+
     //if (t->tipo != TOKEN_ABREPAR && t->tipo != TOKEN_ABRECOL) {
     //    fprintf(stderr, "Erro sintatico: '(' ou '[' esperado");
     //    exit(2);
@@ -71,7 +132,7 @@ Expressao* AnaliseExpressao() {
     t = ProximoToken();
 
     if (t->tipo != TOKEN_SOMA && t->tipo != TOKEN_SUBT && t->tipo != TOKEN_MULT && t->tipo != TOKEN_DIV && t->tipo != TOKEN_MOD && t->tipo != TOKEN_POW) {
-        fprintf(stderr, "Erro sintatico: operador esperado");
+        fprintf(stderr, "Erro sintatico: operador esperado\n");
         exit(2);
     }
 
@@ -110,6 +171,16 @@ Expressao* AnaliseExpressao() {
     return res;
 }
 
+
+void DestroiDeclaracoes(Declaracao *d){
+	Declaracao *d2;
+	while(d != NULL){
+		d2 = d->proxima;
+		free(d);
+		d = d2;
+	}
+}
+
 void DestroiExpressao(Expressao *e) {
     if (e->oper == OPER_SOMA || e->oper == OPER_SUBT || e->oper == OPER_MULT || e->oper == OPER_DIV || e->oper == OPER_MOD || e->oper == OPER_POW) {
         DestroiExpressao(e->op1);
@@ -123,6 +194,7 @@ void DestroiExpressao(Expressao *e) {
 
 void DestroiPrograma(Programa *p) {
     DestroiExpressao(p->e);
+    DestroiDeclaracoes(p->declaracao);
     p->e = NULL;
     free(p);
 }

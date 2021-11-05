@@ -51,7 +51,7 @@ char* TextoToken(long ini, long fim) {
 }
 
 bool simbolo(char c) {
-    return (c == '(' || c == ')' || c == '[' || c == ']'  || c == '+' || c == '-'  || c == '*' || c == '/' || c == '%' || c == '^');
+    return (c == '(' || c == ')' || c == '[' || c == ']'  || c == '+' || c == '-'  || c == '*' || c == '/' || c == '%' || c == '^' || c == '=' || c == ';');
 }
 
 // função: ProximoToken
@@ -69,7 +69,7 @@ Token* ProximoToken() {
         tok->valor = 0;
     } else if (isalpha(buffer->cont[pos])) {
         long initPos = pos;
-        while (!eof() && !isspace(buffer->cont[pos]))
+        while (!eof() && !isspace(buffer->cont[pos]) && !simbolo(buffer->cont[pos]))
             pos++;
         // texto do token: entre initPos e pos-1 no buffer
         char *texto = TextoToken(initPos, pos);
@@ -77,9 +77,13 @@ Token* ProximoToken() {
         {
             tok->tipo = TOKEN_PRINT;
             tok->valor = 0;
-        } else {
-            tok->tipo = TOKEN_ERRO;
+        } else if (strcmp(texto, "var") == 0)
+        {
+            tok->tipo = TOKEN_VAR;
             tok->valor = 0;
+        } else {
+            tok->tipo = TOKEN_IDENT;
+            strcpy(tok->nome, texto);
         }
         free(texto);
     } else if (isdigit(buffer->cont[pos])) {
@@ -133,6 +137,12 @@ Token* ProximoToken() {
                 break;
             case '^':
                 tok->tipo = TOKEN_POW;
+                break;
+            case '=':
+                tok->tipo = TOKEN_ASSIGN;
+                break;
+            case ';':
+                tok->tipo = TOKEN_PTVIR;
                 break;
             default:
                 fprintf(stderr, "Simbolo não esperado: %c\n", buffer->cont[pos]);

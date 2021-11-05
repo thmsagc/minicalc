@@ -5,6 +5,10 @@
 #ifndef MINICALC_PARSER_H
 #define MINICALC_PARSER_H
 
+#include "lexer.h"
+
+#include <string.h>
+
 typedef enum tagTipoOper {
     OPER_SOMA,
     OPER_SUBT,
@@ -12,7 +16,8 @@ typedef enum tagTipoOper {
     OPER_DIV,
     OPER_MOD,
     OPER_POW,
-    OPER_CONST
+    OPER_CONST,
+    OPER_VAR
 } TipoOper;
 
 typedef struct tagExpressao {
@@ -20,13 +25,24 @@ typedef struct tagExpressao {
     struct tagExpressao *op2;
     float valor;
     TipoOper oper;
+    char nomeIdentificador[IDENT_MAX_SIZE];
 } Expressao;
 
+typedef struct tagDeclaracao {
+    char nomeIdentificador[IDENT_MAX_SIZE];
+    Expressao *e;
+    struct tagDeclaracao *proxima;
+} Declaracao;
+
+
 typedef struct tagPrograma {
+	Declaracao *declaracao;
     Expressao *e;
 } Programa;
 
+
 Programa* AnalisePrograma();
+Declaracao* AnaliseDeclaracao();
 Expressao* AnaliseExpressao();
 void DestroiPrograma(Programa *p);
 
