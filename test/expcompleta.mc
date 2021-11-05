@@ -1,3 +1,4 @@
-var x = 10.5;
-var y = 2;
-print (x * y)
+var x = 15;
+var y = 5;
+var z = 2;
+print ((x - y)/2)

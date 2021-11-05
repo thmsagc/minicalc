@@ -50,14 +50,10 @@ float AvaliaExpressao(Expressao* e) {
             v2 = AvaliaExpressao(e->op2);
             res = v1 / v2;
             break;
-        case OPER_MOD:
-        	
-        	if(v1 == (int)v1 && v2 == (int)v2){
-		        v1 = AvaliaExpressao(e->op1);
-		        v2 = AvaliaExpressao(e->op2);
-		        res = (int)v1 % (int)v2;
-		    }
-		    else printf("Operação inválida para valores flutuantes.\n");
+        case OPER_MOD:        	
+		    v1 = AvaliaExpressao(e->op1);
+		    v2 = AvaliaExpressao(e->op2);
+		    res = (int)v1 % (int)v2;
             break;
         case OPER_POW:
             v1 = AvaliaExpressao(e->op1);
@@ -72,7 +68,7 @@ float AvaliaExpressao(Expressao* e) {
 }
 
 int main() {
-    InicializaLexer("./test/expcompleta.mc");
+    InicializaLexer("./test/operacao_pontos_flutuantes.mc");
 
     // arvore sintatica do programa
     Programa *p = AnalisePrograma();
