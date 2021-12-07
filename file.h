@@ -1,9 +1,8 @@
-//
-// Created by archi on 2021/09/07.
-//
+#ifndef FILE_H
+#define FILE_H
 
-#ifndef MINICALC_ARQ_H
-#define MINICALC_ARQ_H
+#include <stdio.h>
+#include <stdlib.h>
 
 typedef struct tagBuffer {
     char *cont;
@@ -13,4 +12,4 @@ typedef struct tagBuffer {
 Buffer* CriaBuffer(char *nome);
 void DestroiBuffer(Buffer *b);
 
-#endif //MINICALC_ARQ_H
+#endif

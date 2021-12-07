@@ -1,43 +1,50 @@
-//
-// Analisador lexico
-//
+#ifndef LEXER_H
+#define LEXER_H
 
-#ifndef MINICALC_LEXER_H
-#define MINICALC_LEXER_H
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include <ctype.h>
+#include <string.h>
+#include "file.h"
 
 #define IDENT_MAX_SIZE 40
 
+
 typedef enum tagTipoToken {
-    TOKEN_INT,
-    TOKEN_FLOAT,
-    TOKEN_PRINT,
-    TOKEN_IDENT,
-    TOKEN_VAR,
-    TOKEN_ASSIGN,
-    TOKEN_PTVIR,
-    TOKEN_ERRO,
-    TOKEN_SOMA,
-    TOKEN_SUBT,
-    TOKEN_MULT,
+    TOKEN_LITERAL,
+    TOKEN_KEYWORD,
+    TOKEN_IDENTIFIER,
+    TOKEN_SEMICOLON,
+    TOKEN_ERROR,
+    TOKEN_ADD,
+    TOKEN_SUB,
+    TOKEN_MUL,
     TOKEN_DIV,
     TOKEN_MOD,
     TOKEN_POW,
-    TOKEN_ABREPAR,
-    TOKEN_FECHAPAR,
-    TOKEN_ABRECOL,
-    TOKEN_FECHACOL,
+    TOKEN_AND,
+    TOKEN_LESS,
+    TOKEN_NEG,
+    TOKEN_COMMA,
+    TOKEN_OPENPARENTHESES,
+    TOKEN_CLOSEPARENTHESES,
+    TOKEN_OPENBRACKETS,
+    TOKEN_CLOSEBRACKETS,
+    TOKEN_OPENKEYS,
+    TOKEN_CLOSEKEYS,
     TOKEN_EOF
 } TipoToken;
 
 typedef struct tagToken {
     TipoToken tipo;
-    double       valor;
+    int valor;
     char nome[IDENT_MAX_SIZE];
 } Token;
 
 void InicializaLexer(char *arqFonte);
 Token* ProximoToken();
+bool isKeyword(char* text);
 void FinalizaLexer();
 
-
-#endif //MINICALC_LEXER_H
+#endif

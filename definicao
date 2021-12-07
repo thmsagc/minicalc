@@ -1,0 +1,26 @@
+Definições
+\a Letra: corresponde ao conjunto das letras do alfabeto mais o caractere underscore {[a-z], [A-Z], [_]}
+\d Digito: corresponde ao conjunto dos dígitos {[0-9]}
+\b Operadores Aritiméticos: {[+,-,*,/, %, ]}
+\u Operadores Binários: {[!]}
+\l Operadores Lógicos: {[&&, <]}
+\s Caractere especial de String: {[\r, \t, \n]}
+\p Caractere de Pontuação: {[;, (, ), [, ], {, }]}
+// indica início de um comentário
+
+; indica fim de linha de comando
+
+Expressões regulares
+
+palavras chave: int, printf, printint, return 
+identificadores (_|\a)(\a|_|\d)*
+literal inteiro \d+
+literais string "(\a|\d|\b|\u|//|;|\s)+"
+operadores aritiméticos \d+\u\d+
+operadores unários \u\d+
+operadores lógicos \d+\l\d+
+comentário //(\a|\d|\b|\u|//|;|\s)*
+
+Gramática:
+
+Expressao

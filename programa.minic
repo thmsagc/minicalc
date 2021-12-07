@@ -1,0 +1,38 @@
+int func_pow(int base, int expoente)
+{
+	return base^expoente;
+}
+
+int resto_div_int(int a, int b)
+{
+	return a%b;
+}
+
+int main()
+{
+	printint(resto_div_int(func_pow(4, 2), 8));
+	return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

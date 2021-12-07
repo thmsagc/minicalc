@@ -1,197 +1,76 @@
+/*#include "file.h"
+#include "lexer.h"
+#include "parser.h"*/
+
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
+#include <stdbool.h>
+#include <string.h>
 
-#include "arq.h"
 #include "lexer.h"
-#include "parser.h"
-#include "var.h"
 
-int potencia(int base, int expoente);
 void ImprimeTipoToken(int tipo);
-void ImprimeDeclaracoes(Declaracao* d);
-void ProcessaDeclaracoes(Declaracao *d);
-void ImprimeResultado(float resultado);
-
-float AvaliaExpressao(Expressao* e) {
-    float res = 0;
-    float v1, v2;
-
-    switch (e->oper) {
-		case OPER_VAR:
-            // consulta a tabela de variaveis para obter o valor
-            if (ConsultaVar(e->nomeIdentificador, &v1)) {
-                res = v1;
-            } else {
-                fprintf(stderr, "Variavel nao declarada: %s\n", e->nomeIdentificador);
-                exit(3);
-            }
-            break;
-        case OPER_CONST:
-            res = e->valor;
-            break;
-        case OPER_SOMA:
-            v1 = AvaliaExpressao(e->op1);
-            v2 = AvaliaExpressao(e->op2);
-            res = v1 + v2;
-            break;
-        case OPER_SUBT:
-            v1 = AvaliaExpressao(e->op1);
-            v2 = AvaliaExpressao(e->op2);
-            res = v1 - v2;
-            break;
-        case OPER_MULT:
-            v1 = AvaliaExpressao(e->op1);
-            v2 = AvaliaExpressao(e->op2);
-            res = v1 * v2;
-            break;
-        case OPER_DIV:
-            v1 = AvaliaExpressao(e->op1);
-            v2 = AvaliaExpressao(e->op2);
-            res = v1 / v2;
-            break;
-        case OPER_MOD:        	
-		    v1 = AvaliaExpressao(e->op1);
-		    v2 = AvaliaExpressao(e->op2);
-		    res = (int)v1 % (int)v2;
-            break;
-        case OPER_POW:
-            v1 = AvaliaExpressao(e->op1);
-            v2 = AvaliaExpressao(e->op2);
-            res = potencia(v1, v2);
-            break;
-        default:
-            printf("Operador nao reconhecido.\n");
-    }
-
-    return res;
-}
 
 int main() {
-    InicializaLexer("./test/operacao_pontos_flutuantes.mc");
+	InicializaLexer("./programa.minic");
 
-    // arvore sintatica do programa
-    Programa *p = AnalisePrograma();
-    
-    //ImprimeDeclaracoes(p->declaracao);
-    
-    ProcessaDeclaracoes(p->declaracao);
+	int i = 0;
 
-
-	float resultado = AvaliaExpressao(p->e);
-    ImprimeResultado(resultado);
-
-    DestroiPrograma(p);
-    FinalizaLexer();
-    return 0;
-}
-
-void ImprimeResultado(float resultado){
-	if(resultado == (int)resultado){
-		printf("%d\n", (int)resultado);
-	} else {
-		printf("%.4f\n", resultado);
+	Token *t = ProximoToken();
+    while (t->tipo != TOKEN_EOF) {
+        if(t->tipo == TOKEN_LITERAL){
+        	printf("%d - ", i);
+        	ImprimeTipoToken(t->tipo);
+        	printf(" - Valor do token: %d\n", t->valor);
+        }
+        else if(t->tipo == TOKEN_IDENTIFIER) {
+            printf("%d - ", i);
+        	ImprimeTipoToken(t->tipo);
+        	printf(" - Valor do token: %s\n", t->nome);
+        }
+        else if(t->tipo == TOKEN_KEYWORD) {
+            printf("%d - ", i);
+        	ImprimeTipoToken(t->tipo);
+        	printf(" - Valor do token: %s\n", t->nome);
+        }
+        else {
+        	printf("%d - ", i);
+        	ImprimeTipoToken(t->tipo);
+        	printf("\n");
+        }
+        t = ProximoToken();
+        i++;
 	}
-}
-
-/*int main() {
-    InicializaLexer("./test/expcompleta.mc");
-
-    // arvore sintatica do programa
-    Programa *p = AnalisePrograma();
-
-    float resultado = AvaliaExpressao(p->e);
-
-    printf("%f\n", resultado);
-
-    DestroiPrograma(p);
-    FinalizaLexer();
-    return 0;
-}*/
-
-
-/*int main() {
-    InicializaLexer("./test/expcompleta.mc");
-
-    Token* token = ProximoToken();
-    
-    while(token->tipo != TOKEN_EOF && token->tipo != TOKEN_ERRO){
-    	printf("Tipo do Token: ");
-    	ImprimeTipoToken(token->tipo);
-    	printf("\n");
-    	
-    	if(token->tipo == TOKEN_INT){
-    		printf("Valor do Token: %.0f\n", token->valor);
-    	} else if(token->tipo == TOKEN_IDENT){
-    		printf("Nome do Identificador: %s\n", token->nome);
-    	} else {
-    		printf("\n");
-    	}
-    	token = ProximoToken();
-    }
-
-
-    FinalizaLexer();
-    return 0;
-}*/
-
-int potencia(int base, int expoente){
-	int resultado = base;
-	for(int i = 1; i < expoente; i++){
-		resultado *= base;
-	}
-	return resultado;
-}
-
-void ImprimeDeclaracoes(Declaracao *d){
-	while(d != NULL){
-		printf("Declaração - ident %s\n", d->nomeIdentificador);
-		d = d->proxima;
-	}
-}
-
-void ProcessaDeclaracoes(Declaracao *d) {
-    while (d != NULL) {
-        float val = AvaliaExpressao(d->e);
-        AdicionaVar(d->nomeIdentificador, val);
-        d = d->proxima;
-    }
+	FinalizaLexer();
+	return 1;
+	
 }
 
 void ImprimeTipoToken(int tipo){
 	switch(tipo){
-		case TOKEN_INT:
-			printf("TOKEN_INT");
+		case TOKEN_LITERAL:
+			printf("TOKEN_LITERAL");
 			break;
-		case TOKEN_FLOAT:
-			printf("TOKEN_FLOAT");
+		case TOKEN_KEYWORD:
+			printf("TOKEN_KEYWORD");
 			break;
-		case TOKEN_PRINT:
-			printf("TOKEN_PRINT");
+		case TOKEN_IDENTIFIER:
+			printf("TOKEN_IDENTIFIER");
 			break;
-		case TOKEN_IDENT:
-			printf("TOKEN_IDENT");
+		case TOKEN_SEMICOLON:
+			printf("TOKEN_SEMICOLON");
 			break;
-		case TOKEN_VAR:
-			printf("TOKEN_VAR");
+		case TOKEN_ERROR:
+			printf("TOKEN_ERROR");
 			break;
-		case TOKEN_ASSIGN:
-			printf("TOKEN_ASSIGN");
+		case TOKEN_ADD:
+			printf("TOKEN_ADD");
 			break;
-		case TOKEN_PTVIR:
-			printf("TOKEN_PTVIR");
+		case TOKEN_SUB:
+			printf("TOKEN_SUB");
 			break;
-		case TOKEN_ERRO:
-			printf("TOKEN_ERRO");
-			break;
-		case TOKEN_SOMA:
-			printf("TOKEN_SOMA");
-			break;
-		case TOKEN_SUBT:
-			printf("TOKEN_SUBT");
-			break;
-		case TOKEN_MULT:
-			printf("TOKEN_MULT");
+		case TOKEN_MUL:
+			printf("TOKEN_MUL");
 			break;
 		case TOKEN_DIV:
 			printf("TOKEN_DIV");
@@ -202,17 +81,35 @@ void ImprimeTipoToken(int tipo){
 		case TOKEN_POW:
 			printf("TOKEN_POW");
 			break;
-		case TOKEN_ABREPAR:
-			printf("TOKEN_ABREPAR");
+		case TOKEN_AND:
+			printf("TOKEN_AND");
 			break;
-		case TOKEN_FECHAPAR:
-			printf("TOKEN_FECHAPAR");
+		case TOKEN_LESS:
+			printf("TOKEN_LESS");
 			break;
-		case TOKEN_ABRECOL:
-			printf("TOKEN_ABRECOL");
+		case TOKEN_NEG:
+			printf("TOKEN_NEG");
 			break;
-		case TOKEN_FECHACOL:
-			printf("TOKEN_FECHACOL");
+		case TOKEN_OPENPARENTHESES:
+			printf("TOKEN_OPENPARENTHESES");
+			break;
+		case TOKEN_CLOSEPARENTHESES:
+			printf("TOKEN_CLOSEPARENTHESES");
+			break;
+		case TOKEN_OPENBRACKETS:
+			printf("TOKEN_OPENBRACKETS");
+			break;
+		case TOKEN_CLOSEBRACKETS:
+			printf("TOKEN_CLOSEBRACKETS");
+			break;
+		case TOKEN_OPENKEYS:
+			printf("TOKEN_OPENKEYS");
+			break;
+		case TOKEN_CLOSEKEYS:
+			printf("TOKEN_CLOSEKEYS");
+			break;
+		case TOKEN_COMMA:
+			printf("TOKEN_COMMA");
 			break;
 		case TOKEN_EOF:
 			printf("TOKEN_EOF");
@@ -222,3 +119,5 @@ void ImprimeTipoToken(int tipo){
 			break;
 	}
 }
+
+

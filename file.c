@@ -1,10 +1,4 @@
-// Le um arquivo completo para um buffer em memoria
-
-#include <stdio.h>
-#include <stdlib.h>
-
-#include "arq.h"
-
+#include "file.h"
 
 long tamanho_arq(FILE *f) {
     fseek(f, 0, SEEK_END);

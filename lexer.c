@@ -1,16 +1,7 @@
-// Analisador léxico para MiniCalc
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdbool.h>
-#include <ctype.h>
-#include <string.h>
-#include "arq.h"
 #include "lexer.h"
 
 static Buffer *buffer;
 static Token *tok = NULL;
-
 static long pos = 0;
 
 void InicializaLexer(char *arqFonte) {
@@ -51,7 +42,7 @@ char* TextoToken(long ini, long fim) {
 }
 
 bool simbolo(char c) {
-    return (c == '(' || c == ')' || c == '[' || c == ']'  || c == '+' || c == '-'  || c == '*' || c == '/' || c == '%' || c == '^' || c == '=' || c == ';');
+    return (c == '(' || c == ')' || c == '[' || c == ']'  || c == '+' || c == '-'  || c == '*' || c == '/' || c == '%' || c == '^' || c == '=' || c == ';' || c == '&' || c == '<' || c == '!' || c  == ',' || c == '{' || c == '}');
 }
 
 // função: ProximoToken
@@ -73,61 +64,64 @@ Token* ProximoToken() {
             pos++;
         // texto do token: entre initPos e pos-1 no buffer
         char *texto = TextoToken(initPos, pos);
-        if (strcmp(texto, "print") == 0)
+        if (isKeyword(texto))
         {
-            tok->tipo = TOKEN_PRINT;
-            tok->valor = 0;
-        } else if (strcmp(texto, "var") == 0)
-        {
-            tok->tipo = TOKEN_VAR;
-            tok->valor = 0;
-        } else {
-            tok->tipo = TOKEN_IDENT;
+            tok->tipo = TOKEN_KEYWORD;
             strcpy(tok->nome, texto);
-        }
+		}
+		else
+		{
+            tok->tipo = TOKEN_IDENTIFIER;
+            strcpy(tok->nome, texto);
+		}
         free(texto);
     } else if (isdigit(buffer->cont[pos])) {
         long initPos = pos;
         // TODO: verificar se existe erro léxico no final do literal inteiro
         while (!eof() && isdigit(buffer->cont[pos]))
             pos++;    
-        if(buffer->cont[pos] == '.'){
-        	pos++;
-		    while (!eof() && isdigit(buffer->cont[pos]))
-		        pos++;
-		    char *texto = TextoToken(initPos, pos);
-		    tok->tipo = TOKEN_FLOAT;
-		    tok->valor = atof(texto);
-		    free(texto);
-        } else {
-		    char *texto = TextoToken(initPos, pos);
-		    tok->tipo = TOKEN_INT;
-		    tok->valor = atoi(texto);
-		    free(texto);       
-        }
 
+	char *texto = TextoToken(initPos, pos);
+	tok->tipo = TOKEN_LITERAL;
+	tok->valor = atoi(texto);
+	free(texto);       
+
+    } else if(buffer->cont[pos] == '/' && buffer->cont[pos+1] == '/'){
+    	long initPos = pos;
+		while (!eof() && buffer->cont[pos] != '\n')
+			pos++;
+		char *texto = TextoToken(initPos, pos); 
+		printf("Comentário: %s\n", texto);
+		free(texto);
+		ProximoToken();
     } else if (simbolo(buffer->cont[pos])) {
         switch (buffer->cont[pos]) {
             case '(':
-                tok->tipo = TOKEN_ABREPAR;
+                tok->tipo = TOKEN_OPENPARENTHESES;
                 break;
             case ')':
-                tok->tipo = TOKEN_FECHAPAR;
+                tok->tipo = TOKEN_CLOSEPARENTHESES;
                 break;
             case '[':
-                tok->tipo = TOKEN_ABRECOL;
+                tok->tipo = TOKEN_OPENBRACKETS;
                 break;
             case ']':
-                tok->tipo = TOKEN_FECHACOL;
+                tok->tipo = TOKEN_CLOSEBRACKETS;
+                break;
+            case '{':
+                tok->tipo = TOKEN_OPENKEYS;
+                break;
+            case '}':
+                tok->tipo = TOKEN_CLOSEKEYS;
                 break;
             case '+':
-                tok->tipo = TOKEN_SOMA;
+                tok->tipo = TOKEN_ADD;
                 break;
             case '-':
-                tok->tipo = TOKEN_SUBT;
+                tok->tipo = TOKEN_SUB;
                 break;
             case '*':
-                tok->tipo = TOKEN_MULT;
+                tok->tipo = TOKEN_MUL;
                 break;
             case '/':
                 tok->tipo = TOKEN_DIV;
@@ -138,28 +132,31 @@ Token* ProximoToken() {
             case '^':
                 tok->tipo = TOKEN_POW;
                 break;
-            case '=':
-                tok->tipo = TOKEN_ASSIGN;
-                break;
             case ';':
-                tok->tipo = TOKEN_PTVIR;
+                tok->tipo = TOKEN_SEMICOLON;
+                break;
+            case '&':
+                tok->tipo = TOKEN_AND;
+                break;
+            case '<':
+                tok->tipo = TOKEN_LESS;
+                break;
+            case '!':
+                tok->tipo = TOKEN_NEG;
+                break;
+            case ',':
+                tok->tipo = TOKEN_COMMA;
                 break;
             default:
                 fprintf(stderr, "Simbolo não esperado: %c\n", buffer->cont[pos]);
         }
         tok->valor = 0;
         pos++;
-    } else if(buffer->cont[pos] == '#'){
-    	long initPos = pos;
-		while (!eof() && buffer->cont[pos] != '\n')
-			pos++;
-		char *texto = TextoToken(initPos, pos); 
-		printf("Comentário: %s\n", texto);
-		free(texto);
-		ProximoToken();
     } else {
-        tok->tipo = TOKEN_ERRO;
+        tok->tipo = TOKEN_ERROR;
         tok->valor = 0;
+        fprintf(stderr, "ERRO LÉXICO: '%c' NÃO ESPERADO\n", buffer->cont[pos]);
+        pos++;
     }
 
     return tok;
@@ -168,4 +165,15 @@ Token* ProximoToken() {
 void FinalizaLexer() {
     DestroiBuffer(buffer);
     free(tok);
+}
+
+bool isKeyword(char* text){
+
+	char *keywords[] = {"printf", "printint", "return", "int"};
+	
+	for(int i = 0; i < 4; i++){
+		if(strcmp(text, keywords[i]) == 0)
+			return true;
+	}
+	return false;
 }
